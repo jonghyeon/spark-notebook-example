@@ -1,0 +1,465 @@
+{
+  "paragraphs": [
+    {
+      "text": "%md\n###Apache Spark on Amazon EMR with Apache Zeppelin !\n\nCongratulations! \nIf you see this message on your Zeppelin means that you success to create your EMR clusters and run spark.         \n\nBelow example will help you to explore how you can use [Spark Dataframe](http://spark.apache.org/docs/1.5.0/sql-programming-guide.html#dataframes) and how quickly you can start processing data using Spark on Amazon EMR. \nThe given parquet format data ( originally CSV ) comes from the Department of Transportation : \"[Public data set outlining flight information since 1987](https://catalog.data.gov/dataset/airline-on-time-performance-and-causes-of-flight-delays)\".\nThe data set is around 4GB compressed ( 79GB uncompressed ) and contains 162,212,419 rows, so it makes sense to use a distriubuted framework like Spark for querying.\n\nIn this example, we can get below information.\n\n* The 10 airports with the most departures.\n* The most flight delays over 15 minutes.\n* The most flight delays over 60 minutes.\n* The most flight cancellations. \n* The number of flight cancellations by yearly quarter. \n* The 10 most popular flight routes.\n\nThis data is located in `US East region`, so please note that you must have launched your EMR cluster on `US East region`.\n\nFor more information about this example, refer to [here](https://aws.amazon.com/ko/blogs/aws/new-apache-spark-on-amazon-emr/).\n\n####Let\u0027s get started !\n\n",
+      "dateUpdated": "Jan 25, 2016 10:52:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "editorMode": "ace/mode/markdown",
+        "tableHide": false,
+        "editorHide": false,
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447820412262_-41056437",
+      "id": "20151118-042012_1473504271",
+      "result": {
+        "code": "SUCCESS",
+        "type": "HTML",
+        "msg": "\u003ch3\u003eApache Spark on Amazon EMR with Apache Zeppelin !\u003c/h3\u003e\n\u003cp\u003eCongratulations!\n\u003cbr  /\u003eIf you see this message on your Zeppelin means that you success to create your EMR clusters and run spark.\u003c/p\u003e\n\u003cp\u003eBelow example will help you to explore how you can use \u003ca href\u003d\"http://spark.apache.org/docs/1.5.0/sql-programming-guide.html#dataframes\"\u003eSpark Dataframe\u003c/a\u003e and how quickly you can start processing data using Spark on Amazon EMR.\n\u003cbr  /\u003eThe given parquet format data ( originally CSV ) comes from the Department of Transportation : \u0026ldquo;\u003ca href\u003d\"https://catalog.data.gov/dataset/airline-on-time-performance-and-causes-of-flight-delays\"\u003ePublic data set outlining flight information since 1987\u003c/a\u003e\u0026ldquo;.\n\u003cbr  /\u003eThe data set is around 4GB compressed ( 79GB uncompressed ) and contains 162,212,419 rows, so it makes sense to use a distriubuted framework like Spark for querying.\u003c/p\u003e\n\u003cp\u003eIn this example, we can get below information.\u003c/p\u003e\n\u003cul\u003e\n\u003cli\u003eThe 10 airports with the most departures.\u003c/li\u003e\n\u003cli\u003eThe most flight delays over 15 minutes.\u003c/li\u003e\n\u003cli\u003eThe most flight delays over 60 minutes.\u003c/li\u003e\n\u003cli\u003eThe most flight cancellations.\u003c/li\u003e\n\u003cli\u003eThe number of flight cancellations by yearly quarter.\u003c/li\u003e\n\u003cli\u003eThe 10 most popular flight routes.\u003c/li\u003e\n\u003c/ul\u003e\n\u003cp\u003eThis data is located in \u003ccode\u003eUS East region\u003c/code\u003e, so please note that you must have launched your EMR cluster on \u003ccode\u003eUS East region\u003c/code\u003e.\u003c/p\u003e\n\u003cp\u003eFor more information about this example, refer to \u003ca href\u003d\"https://aws.amazon.com/ko/blogs/aws/new-apache-spark-on-amazon-emr/\"\u003ehere\u003c/a\u003e.\u003c/p\u003e\n\u003ch4\u003eLet\u0027s get started !\u003c/h4\u003e\n"
+      },
+      "dateCreated": "Nov 18, 2015 4:20:12 AM",
+      "dateStarted": "Nov 18, 2015 7:05:56 AM",
+      "dateFinished": "Nov 18, 2015 7:05:56 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Analytics With Spark – A Quick Example",
+      "text": "val parquetFile \u003d sqlContext.parquetFile(\"s3://us-east-1.elasticmapreduce.samples/flightdata/input/\")\nparquetFile.registerTempTable(\"flights\")\n\n//1. Top 10 airports with the most departures since 2000\nval topDepartures \u003d sqlc.table(\"flights\")\n    .filter($\"year\" \u003e\u003d 2000)\n    .groupBy($\"origin\")\n    .agg(count($\"*\").as(\"total_departures\"))\n    .orderBy($\"total_departures\")\n    .sort($\"total_departures\".desc)\n    .limit(10)\n\n//2. Top 10 airports with the most departure delays over 15 minutes since 2000\nval shortDepDelay \u003d sqlc.table(\"flights\")\n    .filter($\"depDelay\" \u003e\u003d 15 \u0026\u0026 $\"year\" \u003e\u003d 2000)\n    .groupBy($\"origin\")\n    .agg(count($\"depDelay\").as(\"cnt\"))\n    .orderBy($\"cnt\")\n    .sort($\"cnt\".desc)\n    .limit(10)\n\n//3. Top 10 airports with the most departure delays over 60 minutes since 2000\nval longDepDelay \u003d sqlc.table(\"flights\")\n    .filter($\"depDelay\" \u003e 60 \u0026\u0026 $\"year\" \u003e\u003d 2000)\n    .groupBy($\"origin\")\n    .agg(count($\"depDelay\").as(\"total_delays\"))\n    .orderBy($\"total_delays\")\n    .sort($\"total_delays\".desc)\n    .limit(10)\n\n//4. Top 10 airports with the most departure cancellations since 2000\nval topCancel \u003d sqlc.table(\"flights\")\n    .filter($\"cancelled\" \u003d\u003d\u003d 1 \u0026\u0026 $\"year\" \u003e\u003d 2000)\n    .groupBy($\"origin\")\n    .agg(count($\"cancelled\").as(\"total_cancellations\"))\n    .orderBy($\"total_cancellations\")\n    .sort($\"total_cancellations\".desc)\n    .limit(10)\n\n//5. Rank of the worst quarter of the year for departure cancellations\nval quarterCancel \u003d sqlc.table(\"flights\")\n    .filter($\"cancelled\" \u003d\u003d\u003d 1)\n    .groupBy($\"quarter\")\n    .agg(count($\"cancelled\").as(\"total_cancellations\"))\n    .orderBy($\"total_cancellations\")\n    .sort($\"total_cancellations\".desc)\n    .limit(10)\n\n//6. Top 10 most popular flight routes since 2000\nval popularFlights \u003d sqlc.table(\"flights\")\n    .filter($\"year\" \u003e\u003d 2000)\n    .groupBy($\"origin\", $\"dest\")\n    .agg(count($\"*\").as(\"total_flights\"))\n    .orderBy($\"total_flights\")\n    .sort($\"total_flights\".desc)\n    .limit(10)",
+      "dateUpdated": "Nov 18, 2015 4:21:17 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": true,
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447741017021_-1226584722",
+      "id": "20151117-061657_7891229",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "warning: there were 1 deprecation warning(s); re-run with -deprecation for details\nparquetFile: org.apache.spark.sql.DataFrame \u003d [year: int, quarter: int, month: int, dayofmonth: int, dayofweek: int, flightdate: string, uniquecarrier: string, airlineid: int, carrier: string, tailnum: string, flightnum: int, originairportid: int, originairportseqid: int, origincitymarketid: int, origin: string, origincityname: string, originstate: string, originstatefips: int, originstatename: string, originwac: int, destairportid: int, destairportseqid: int, destcitymarketid: int, dest: string, destcityname: string, deststate: string, deststatefips: int, deststatename: string, destwac: int, crsdeptime: int, deptime: int, depdelay: int, depdelayminutes: int, depdel15: int, departuredelaygroups: int, deptimeblk: int, taxiout: int, wheelsoff: int, wheelson: int, taxiin: int, crsarrtime: ...topDepartures: org.apache.spark.sql.DataFrame \u003d [origin: string, total_departures: bigint]\nshortDepDelay: org.apache.spark.sql.DataFrame \u003d [origin: string, cnt: bigint]\nlongDepDelay: org.apache.spark.sql.DataFrame \u003d [origin: string, total_delays: bigint]\ntopCancel: org.apache.spark.sql.DataFrame \u003d [origin: string, total_cancellations: bigint]\nquarterCancel: org.apache.spark.sql.DataFrame \u003d [quarter: int, total_cancellations: bigint]\npopularFlights: org.apache.spark.sql.DataFrame \u003d [origin: string, dest: string, total_flights: bigint]\n"
+      },
+      "dateCreated": "Nov 17, 2015 6:16:57 AM",
+      "dateStarted": "Nov 18, 2015 4:00:47 AM",
+      "dateFinished": "Nov 18, 2015 4:00:52 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Top 10 airports with the most departures since 2000",
+      "text": "z.show(topDepartures)",
+      "dateUpdated": "Jan 25, 2016 10:48:17 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "pieChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "total_departures",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            },
+            "yAxis": {
+              "name": "total_departures",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "editorHide": false,
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447818996576_-1319247002",
+      "id": "20151118-035636_1725424413",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "origin\ttotal_departures\nATL\t5683237\nORD\t5063315\nDFW\t4402632\nLAX\t3318774\nDEN\t3038788\nPHX\t2801223\nIAH\t2701763\nLAS\t2313143\nDTW\t2126781\nSFO\t2115094\n"
+      },
+      "dateCreated": "Nov 18, 2015 3:56:36 AM",
+      "dateStarted": "Nov 18, 2015 4:07:18 AM",
+      "dateFinished": "Nov 18, 2015 4:10:23 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Top 10 airports with the most departure delays over 15 minutes since 2000",
+      "text": "z.show(shortDepDelay)",
+      "dateUpdated": "Jan 25, 2016 10:48:11 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "multiBarChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "cnt",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {}
+        },
+        "title": true,
+        "enabled": true,
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447815845661_1976225850",
+      "id": "20151118-030405_879448737",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "origin\tcnt\nORD\t1188243\nATL\t1171955\nDFW\t878203\nDEN\t610131\nLAX\t559448\nPHX\t518366\nLAS\t485003\nIAH\t443310\nEWR\t427884\nSFO\t424183\n"
+      },
+      "dateCreated": "Nov 18, 2015 3:04:05 AM",
+      "dateStarted": "Nov 18, 2015 3:56:36 AM",
+      "dateFinished": "Nov 18, 2015 4:00:36 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Top 10 airports with the most departure delays over 60 minutes since 2000",
+      "text": "z.show(longDepDelay)",
+      "dateUpdated": "Jan 25, 2016 10:48:06 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "pieChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "total_delays",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {}
+        },
+        "title": true,
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447815868653_1609206048",
+      "id": "20151118-030428_1561593869",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "origin\ttotal_delays\nORD\t396683\nATL\t320400\nDFW\t243724\nDEN\t166241\nEWR\t151327\nSFO\t145541\nLAX\t135719\nIAH\t123010\nPHX\t115786\nLAS\t109413\n"
+      },
+      "dateCreated": "Nov 18, 2015 3:04:28 AM",
+      "dateStarted": "Nov 18, 2015 4:00:59 AM",
+      "dateFinished": "Nov 18, 2015 4:04:44 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Top 10 airports with the most departure cancellations since 2000",
+      "text": "z.show(topCancel)",
+      "dateUpdated": "Jan 25, 2016 10:48:23 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "multiBarChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "total_cancellations",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {
+            "xAxis": {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            },
+            "yAxis": {
+              "name": "total_cancellations",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          }
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "editorHide": true,
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447813568313_900235895",
+      "id": "20151118-022608_284490634",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "origin\ttotal_cancellations\nORD\t176767\nDFW\t100473\nATL\t99409\nLGA\t76660\nEWR\t67089\nBOS\t60093\nLAX\t50896\nSFO\t46219\nDCA\t44218\nDEN\t43047\n"
+      },
+      "dateCreated": "Nov 18, 2015 2:26:08 AM",
+      "dateStarted": "Nov 18, 2015 3:05:39 AM",
+      "dateFinished": "Nov 18, 2015 3:08:51 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Rank of the worst quarter of the year for departure cancellations",
+      "text": "z.show(quarterCancel)\n    ",
+      "dateUpdated": "Jan 25, 2016 10:48:29 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "pieChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "quarter",
+              "index": 0.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "total_cancellations",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {}
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "editorHide": true,
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447813211092_-1041898287",
+      "id": "20151118-022011_1748410027",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "quarter\ttotal_cancellations\n1\t1061649\n3\t718676\n4\t632627\n2\t554400\n"
+      },
+      "dateCreated": "Nov 18, 2015 2:20:11 AM",
+      "dateStarted": "Nov 18, 2015 3:03:09 AM",
+      "dateFinished": "Nov 18, 2015 3:05:19 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "Top 10 most popular flight routes since 2000",
+      "text": "z.show(popularFlights)",
+      "dateUpdated": "Jan 25, 2016 10:48:34 PM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "multiBarChart",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [
+            {
+              "name": "origin",
+              "index": 0.0,
+              "aggr": "sum"
+            },
+            {
+              "name": "dest",
+              "index": 1.0,
+              "aggr": "sum"
+            }
+          ],
+          "values": [
+            {
+              "name": "total_flights",
+              "index": 2.0,
+              "aggr": "sum"
+            }
+          ],
+          "groups": [],
+          "scatter": {}
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true,
+        "editorHide": true,
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447815945545_1545846717",
+      "id": "20151118-030545_905749050",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TABLE",
+        "msg": "origin\tdest\ttotal_flights\nLAX\tLAS\t192576\nLAS\tLAX\t189801\nSFO\tLAX\t189702\nLAX\tSFO\t187680\nSAN\tLAX\t171133\nLAX\tSAN\t171059\nPHX\tLAX\t164053\nLAX\tPHX\t162193\nLGA\tORD\t161917\nORD\tLGA\t159844\n"
+      },
+      "dateCreated": "Nov 18, 2015 3:05:45 AM",
+      "dateStarted": "Nov 18, 2015 3:09:20 AM",
+      "dateFinished": "Nov 18, 2015 3:13:11 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "title": "the structure of Schema : flights",
+      "text": "topDepartures.printSchema",
+      "dateUpdated": "Nov 18, 2015 4:14:53 AM",
+      "config": {
+        "colWidth": 12.0,
+        "graph": {
+          "mode": "table",
+          "height": 300.0,
+          "optionOpen": false,
+          "keys": [],
+          "values": [],
+          "groups": [],
+          "scatter": {}
+        },
+        "editorMode": "ace/mode/scala",
+        "title": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447741075175_850967393",
+      "id": "20151117-061755_1131620892",
+      "result": {
+        "code": "SUCCESS",
+        "type": "TEXT",
+        "msg": "root\n |-- year: integer (nullable \u003d true)\n |-- quarter: integer (nullable \u003d true)\n |-- month: integer (nullable \u003d true)\n |-- dayofmonth: integer (nullable \u003d true)\n |-- dayofweek: integer (nullable \u003d true)\n |-- flightdate: string (nullable \u003d true)\n |-- uniquecarrier: string (nullable \u003d true)\n |-- airlineid: integer (nullable \u003d true)\n |-- carrier: string (nullable \u003d true)\n |-- tailnum: string (nullable \u003d true)\n |-- flightnum: integer (nullable \u003d true)\n |-- originairportid: integer (nullable \u003d true)\n |-- originairportseqid: integer (nullable \u003d true)\n |-- origincitymarketid: integer (nullable \u003d true)\n |-- origin: string (nullable \u003d true)\n |-- origincityname: string (nullable \u003d true)\n |-- originstate: string (nullable \u003d true)\n |-- originstatefips: integer (nullable \u003d true)\n |-- originstatename: string (nullable \u003d true)\n |-- originwac: integer (nullable \u003d true)\n |-- destairportid: integer (nullable \u003d true)\n |-- destairportseqid: integer (nullable \u003d true)\n |-- destcitymarketid: integer (nullable \u003d true)\n |-- dest: string (nullable \u003d true)\n |-- destcityname: string (nullable \u003d true)\n |-- deststate: string (nullable \u003d true)\n |-- deststatefips: integer (nullable \u003d true)\n |-- deststatename: string (nullable \u003d true)\n |-- destwac: integer (nullable \u003d true)\n |-- crsdeptime: integer (nullable \u003d true)\n |-- deptime: integer (nullable \u003d true)\n |-- depdelay: integer (nullable \u003d true)\n |-- depdelayminutes: integer (nullable \u003d true)\n |-- depdel15: integer (nullable \u003d true)\n |-- departuredelaygroups: integer (nullable \u003d true)\n |-- deptimeblk: integer (nullable \u003d true)\n |-- taxiout: integer (nullable \u003d true)\n |-- wheelsoff: integer (nullable \u003d true)\n |-- wheelson: integer (nullable \u003d true)\n |-- taxiin: integer (nullable \u003d true)\n |-- crsarrtime: integer (nullable \u003d true)\n |-- arrtime: integer (nullable \u003d true)\n |-- arrdelay: integer (nullable \u003d true)\n |-- arrdelayminutes: integer (nullable \u003d true)\n |-- arrdel15: integer (nullable \u003d true)\n |-- arrivaldelaygroups: integer (nullable \u003d true)\n |-- arrtimeblk: string (nullable \u003d true)\n |-- cancelled: integer (nullable \u003d true)\n |-- cancellationcode: integer (nullable \u003d true)\n |-- diverted: integer (nullable \u003d true)\n |-- crselapsedtime: integer (nullable \u003d true)\n |-- actualelapsedtime: integer (nullable \u003d true)\n |-- airtime: integer (nullable \u003d true)\n |-- flights: integer (nullable \u003d true)\n |-- distance: integer (nullable \u003d true)\n |-- distancegroup: integer (nullable \u003d true)\n |-- carrierdelay: integer (nullable \u003d true)\n |-- weatherdelay: integer (nullable \u003d true)\n |-- nasdelay: integer (nullable \u003d true)\n |-- securitydelay: integer (nullable \u003d true)\n |-- lateaircraftdelay: integer (nullable \u003d true)\n |-- firstdeptime: integer (nullable \u003d true)\n |-- totaladdgtime: integer (nullable \u003d true)\n |-- longestaddgtime: integer (nullable \u003d true)\n |-- divairportlandings: integer (nullable \u003d true)\n |-- divreacheddest: integer (nullable \u003d true)\n |-- divactualelapsedtime: integer (nullable \u003d true)\n |-- divarrdelay: integer (nullable \u003d true)\n |-- divdistance: integer (nullable \u003d true)\n |-- div1airport: integer (nullable \u003d true)\n |-- div1airportid: integer (nullable \u003d true)\n |-- div1airportseqid: integer (nullable \u003d true)\n |-- div1wheelson: integer (nullable \u003d true)\n |-- div1totalgtime: integer (nullable \u003d true)\n |-- div1longestgtime: integer (nullable \u003d true)\n |-- div1wheelsoff: integer (nullable \u003d true)\n |-- div1tailnum: integer (nullable \u003d true)\n |-- div2airport: integer (nullable \u003d true)\n |-- div2airportid: integer (nullable \u003d true)\n |-- div2airportseqid: integer (nullable \u003d true)\n |-- div2wheelson: integer (nullable \u003d true)\n |-- div2totalgtime: integer (nullable \u003d true)\n |-- div2longestgtime: integer (nullable \u003d true)\n |-- div2wheelsoff: integer (nullable \u003d true)\n |-- div2tailnum: integer (nullable \u003d true)\n |-- div3airport: integer (nullable \u003d true)\n |-- div3airportid: integer (nullable \u003d true)\n |-- div3airportseqid: integer (nullable \u003d true)\n |-- div3wheelson: integer (nullable \u003d true)\n |-- div3totalgtime: integer (nullable \u003d true)\n |-- div3longestgtime: integer (nullable \u003d true)\n |-- div3wheelsoff: integer (nullable \u003d true)\n |-- div3tailnum: integer (nullable \u003d true)\n |-- div4airport: integer (nullable \u003d true)\n |-- div4airportid: integer (nullable \u003d true)\n |-- div4airportseqid: integer (nullable \u003d true)\n |-- div4wheelson: integer (nullable \u003d true)\n |-- div4totalgtime: integer (nullable \u003d true)\n |-- div4longestgtime: integer (nullable \u003d true)\n |-- div4wheelsoff: integer (nullable \u003d true)\n |-- div4tailnum: integer (nullable \u003d true)\n |-- div5airport: integer (nullable \u003d true)\n |-- div5airportid: integer (nullable \u003d true)\n |-- div5airportseqid: integer (nullable \u003d true)\n |-- div5wheelson: integer (nullable \u003d true)\n |-- div5totalgtime: integer (nullable \u003d true)\n |-- div5longestgtime: integer (nullable \u003d true)\n |-- div5wheelsoff: integer (nullable \u003d true)\n |-- div5tailnum: integer (nullable \u003d true)\n\n"
+      },
+      "dateCreated": "Nov 17, 2015 6:17:55 AM",
+      "dateStarted": "Nov 18, 2015 2:21:49 AM",
+      "dateFinished": "Nov 18, 2015 2:21:49 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "jobName": "paragraph_1447819638307_621365677",
+      "id": "20151118-040718_1460793654",
+      "dateCreated": "Nov 18, 2015 4:07:18 AM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "Public data set outlining flight information since 1987",
+  "id": "2B3QSZTKR",
+  "angularObjects": {
+    "2BA4V8E6F": [],
+    "2BCU55QBK": [],
+    "2B96AZGUQ": [],
+    "2BBV35BW6": [],
+    "2BB3QSUCP": [],
+    "2BAXZ5VCF": [],
+    "2BCNQANPD": [],
+    "2BCHJBFY7": [],
+    "2B9YNYQHM": [],
+    "2BA6V418V": [],
+    "2BBXD8S5P": [],
+    "2BAKHVHWU": [],
+    "2BCRHUYWH": []
+  },
+  "config": {
+    "looknfeel": "default"
+  },
+  "info": {}
+}
