@@ -1,4 +1,4 @@
-var zeppelinHeliumPackages = [
+[
   {
     "zeppelin-highcharts-scatterplot": {
       "latest": {
