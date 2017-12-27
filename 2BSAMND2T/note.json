@@ -1,0 +1,28 @@
+{
+  "_id": "uniq-17",
+  "type": "notebook",
+  "meta": {
+    "owner": {
+      "organizationId": "UXXXXXXX1",
+      "id": "UXXXXXXX1",
+      "displayName": "anthonycorbacho",
+      "avatar": ""
+    },
+    "instance": "SXZEPPNX1",
+    "lastUpdate": "2016-01-08 02:11:53.158",
+    "history": [{"id": "uniq-17-rev-1", "message": "first-commit", "time": 1494543560}],
+    "public": false,
+    "runnable": false,
+    "showcases": ""
+  },
+  "paragraphs": [
+    "uniq-17-p1"
+  ],
+  "name": "Revision-note",
+  "id": "2BSAMND2T",
+  "angularObjects": {},
+  "config": {
+    "looknfeel": "default"
+  },
+  "info": {}
+}
